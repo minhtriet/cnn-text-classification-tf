@@ -4,9 +4,9 @@ import numpy as np
 
 class cnn(object):
 
-    def __init__(
-            self, sequence_length, num_classes, vocab_size,
-            embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
+    def __init__(self, filter_sizes, num_filters, l2_reg_lambda=0.0):
+
+        num_classes = 12
 
         # Placeholders for input, output and dropout
         # self.input_x = tf.placeholder(tf.string, [None, sequence_length], name="input_x") 
@@ -39,9 +39,10 @@ class cnn(object):
                 h = tf.nn.relu(tf.nn.bias_add(conv, b), name="relu")
 
                 # Maxpooling over the outputs
+                # TODO: ksize = [1, sequence_length - filter_size + 1, 1, 1] previously
                 pooled = tf.nn.max_pool(
                     h,
-                    ksize=[1, sequence_length - filter_size + 1, 1, 1],
+                    ksize=[1, filter_size + 1, 1, 1],
                     strides=[1, 1, 1, 1],
                     padding='VALID',
                     name="pool")
