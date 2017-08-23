@@ -61,8 +61,6 @@ y_train, y_val = y[:dev_sample_index], y[dev_sample_index:]
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_val)))
 
 # Training
-# ==================================================
-
 with tf.Graph().as_default():
     session_conf = tf.ConfigProto(
       allow_soft_placement=FLAGS.allow_soft_placement,
@@ -70,6 +68,8 @@ with tf.Graph().as_default():
     sess = tf.Session(config=session_conf)
     with sess.as_default():
         cnn = cnn(
+            sequence_length=x_train.shape[1],
+            num_classes=12,
             embedding_size=FLAGS.embedding_dim,
             vocab_size=len(vocab_processor.vocabulary_),
             filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
@@ -125,9 +125,6 @@ with tf.Graph().as_default():
         sess.run(tf.global_variables_initializer())
 
         def train_step(x_batch, y_batch):
-            """
-            A single training step
-            """
             feed_dict = {
               cnn.input_x: x_batch,
               cnn.input_y: y_batch,
@@ -141,9 +138,6 @@ with tf.Graph().as_default():
             train_summary_writer.add_summary(summaries, step)
 
         def dev_step(x_batch, y_batch, writer=None):
-            """
-            Evaluates model on a dev set
-            """
             feed_dict = {
               cnn.input_x: x_batch,
               cnn.input_y: y_batch,

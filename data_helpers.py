@@ -2,7 +2,9 @@ import numpy as np
 import re
 import itertools
 from collections import Counter
+import pdb
 
+num_classes = 12
 
 def load_data_and_labels():
     data_file = 'xtrain_obfuscated.txt'
@@ -10,7 +12,11 @@ def load_data_and_labels():
     with open(data_file, 'r') as f:
         x_text = np.array(f.read().splitlines())
     with open(label, 'r') as f:
-        y = np.array(f.read().splitlines(), dtype=np.float)
+        temp = f.read().splitlines()
+    # one hot for y
+    y = np.zeros((len(temp), num_classes))
+    for idx, val in enumerate(temp):
+        y[idx][int(val)] = 1
     return [x_text, y]
 
 
