@@ -16,9 +16,9 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 tf.flags.DEFINE_string("x_train", "xtrain_obfuscated", "Data source for the positive data.")
 
 # Model Hyperparameters
-tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
-tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
+tf.flags.DEFINE_string("filter_sizes", "4,8,16,32", "Comma-separated filter sizes (default: '3,4,5')")
+tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.1, "L2 regularization lambda")
 
@@ -26,7 +26,7 @@ tf.flags.DEFINE_float("l2_reg_lambda", 0.1, "L2 regularization lambda")
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
-tf.flags.DEFINE_integer("checkpoint_every", 1, "Save model after this many steps (default: 100)")
+tf.flags.DEFINE_integer("checkpoint_every", 200, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -45,7 +45,7 @@ print("")
 
 # Load data
 print("Loading data...")
-x, y = data_helpers.load_data_and_labels(FLAGS.x_train, FLAGS.y_train)
+x, y = data_helpers.load_data_and_labels()
 # TODO: Stochastic grad desc maybe??
 
 max_document_length = max([len(xx) for xx in x])
@@ -117,7 +117,6 @@ with tf.Graph().as_default():
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
         saver = tf.train.Saver(tf.global_variables(), max_to_keep=FLAGS.num_checkpoints)
-        pdb.set_trace()
 
         # Write vocabulary
         vocab_processor.save(os.path.join(out_dir, "vocab"))
@@ -165,6 +164,5 @@ with tf.Graph().as_default():
                 dev_step(x_val, y_val, writer=dev_summary_writer)
                 print("")
             if current_step % FLAGS.checkpoint_every == 0:
-                pdb.set_trace()
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))

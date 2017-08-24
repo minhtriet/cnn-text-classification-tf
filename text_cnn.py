@@ -10,9 +10,6 @@ class cnn(object):
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x") 
         self.input_y = tf.placeholder(tf.int64, [None, num_classes], name="input_y")
 
-        # TODO: Is size needed here
-        #self.input_x = tf.placeholder(tf.int32, name="input_x") 
-        #self.input_y = tf.placeholder(tf.int32, name="input_y")
         # TODO: Dropout layer
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
@@ -45,7 +42,6 @@ class cnn(object):
                 h = tf.nn.relu(tf.nn.bias_add(conv, b), name="relu")
 
                 # Maxpooling over the outputs
-                # TODO: ksize = [1, sequence_length - filter_size + 1, 1, 1] previously
                 pooled = tf.nn.max_pool(
                     h,
                     ksize=[1, sequence_length - filter_size + 1, 1, 1],
