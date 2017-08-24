@@ -6,6 +6,11 @@ import pdb
 
 num_classes = 12
 
+def load_data(file_path):
+    with open(file_path, 'r') as f:
+        x_text = np.array(f.read().splitlines())
+    return x_text
+
 def load_data_and_labels():
     data_file = 'xtrain_obfuscated.txt'
     label = 'ytrain.txt'

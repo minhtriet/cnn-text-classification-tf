@@ -6,21 +6,23 @@ import os
 import time
 import datetime
 import data_helpers
-from text_cnn import TextCNN
+from text_cnn import cnn
 from tensorflow.contrib import learn
 import csv
+import pdb
 
 # Parameters
 # ==================================================
 
 # Data Parameters
-tf.flags.DEFINE_string("positive_data_file", "./data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data.")
-tf.flags.DEFINE_string("negative_data_file", "./data/rt-polaritydata/rt-polarity.neg", "Data source for the positive data.")
+tf.flags.DEFINE_string("x", "xval.txt", "Data source for the positive data.")
+tf.flags.DEFINE_string("x_test", "xtest_obfuscated.txt", "Data source for the positive data.")
+tf.flags.DEFINE_string("y", "yval.txt", "Data source for the positive data.")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "", "Checkpoint directory from training run")
-tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
+tf.flags.DEFINE_string("checkpoint_dir", "runs/1503513699/checkpoints", "Checkpoint directory from training run")
+tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -34,13 +36,11 @@ for attr, value in sorted(FLAGS.__flags.items()):
     print("{}={}".format(attr.upper(), value))
 print("")
 
-# CHANGE THIS: Load data. Load your own data here
 if FLAGS.eval_train:
-    x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
-    y_test = np.argmax(y_test, axis=1)
+    x_raw = data_helpers.load_data(FLAGS.x)
+    y_test = data_helpers.load_data(FLAGS.y).astype(int) 
 else:
     x_raw = ["a masterpiece four years in the making", "everything is off."]
-    y_test = [1, 0]
 
 # Map data into vocabulary
 vocab_path = os.path.join(FLAGS.checkpoint_dir, "..", "vocab")
@@ -75,7 +75,7 @@ with graph.as_default():
         batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
 
         # Collect the predictions here
-        all_predictions = []
+        all_predictions = np.array([])
 
         for x_test_batch in batches:
             batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
