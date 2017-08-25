@@ -16,14 +16,14 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 tf.flags.DEFINE_string("x_train", "xtrain_obfuscated", "Data source for the positive data.")
 
 # Model Hyperparameters
-tf.flags.DEFINE_string("filter_sizes", "4,8,16,32", "Comma-separated filter sizes (default: '3,4,5')")
+tf.flags.DEFINE_string("filter_sizes", "5,5,5", "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
+tf.flags.DEFINE_integer("num_filters", 1, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.1, "L2 regularization lambda")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 1, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 200, "Save model after this many steps (default: 100)")
@@ -68,7 +68,6 @@ with tf.Graph().as_default():
     sess = tf.Session(config=session_conf)
     with sess.as_default():
         cnn = cnn(
-            sequence_length=x_train.shape[1],
             num_classes=12,
             embedding_size=FLAGS.embedding_dim,
             vocab_size=len(vocab_processor.vocabulary_),
@@ -166,3 +165,4 @@ with tf.Graph().as_default():
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))
+
